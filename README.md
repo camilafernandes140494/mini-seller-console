@@ -1,69 +1,144 @@
-# React + TypeScript + Vite
+# Mini Seller Console
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight console to manage and triage leads, and convert them into opportunities. Built with **React**, **TypeScript**, and **Tailwind CSS**. This project demonstrates a clean structure, responsive UI, and modern frontend best practices.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Table of Contents
 
-## Expanding the ESLint configuration
+- [Project Overview](#project-overview)  
+- [Features](#features)  
+- [Architecture](#architecture)  
+- [Getting Started](#getting-started)  
+- [Project Structure](#project-structure)  
+- [Tech Stack](#tech-stack)  
+- [Future Improvements](#future-improvements)  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Project Overview
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+The Mini Seller Console is designed as a lightweight dashboard to manage **leads** and convert them into **opportunities**. This project focuses on **frontend architecture, state management, and UX considerations**, simulating API calls using local JSON data.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Key goals:  
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Display a searchable, sortable, and filterable list of leads  
+- Show a detailed panel for each lead with inline editing  
+- Convert leads into opportunities  
+- Handle basic loading, empty, and error states  
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Features
+
+### MVP Features
+
+1. **Leads List**  
+   - Load from `data/leads.json`  
+   - Fields: `id`, `name`, `company`, `email`, `source`, `score`, `status`  
+   - Search by name/company, filter by status, sort by score (desc)  
+
+2. **Lead Detail Panel**  
+   - Slide-over panel on row click  
+   - Inline edit for `status` and `email` (with validation)  
+   - Save/cancel with basic error handling  
+
+3. **Convert to Opportunity**  
+   - Button to convert a lead  
+   - Opportunity fields: `id`, `name`, `stage`, `amount` (optional), `accountName`  
+   - Display opportunities in a simple table  
+
+4. **UX/States**  
+   - Loading, empty, and simple error states  
+   - Smooth handling of ~100 leads  
+
+### Nice-to-Haves (Optional Implemented)  
+- Persist filters/sorting in `localStorage`  
+- Optimistic updates with rollback simulation  
+- Responsive layout for desktop and mobile  
+
+---
+
+## Architecture
+
+- **React + Vite** for fast development  
+- **Tailwind CSS** for styling and responsive design  
+- **TypeScript** for type safety  
+- Local JSON used as the data source (`data/leads.json`)  
+- Components organized as:
+  - `components/LeadList.tsx`  
+  - `components/LeadDetailPanel.tsx`  
+  - `components/OpportunitiesTable.tsx`  
+- Types defined in `types/lead.ts` and `types/opportunity.ts`  
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18.x  
+- Yarn or npm  
+
+### Installation
+
+```bash
+# Clone the repo
+git clone <repo-url>
+cd mini-seller-console
+
+# Install dependencies
+npm install
+# or
+yarn install
+
+# Start the development server
+npm run dev
+# or
+yarn dev
+
+
+Usage
+
+Open http://localhost:5173
+
+Browse leads, edit details, and convert them into opportunities
+
+Project Structure
+
+src/
+  components/
+    LeadList.tsx
+    LeadDetailPanel.tsx
+    OpportunitiesTable.tsx
+  data/
+    leads.json
+  pages/
+    Dashboard.tsx
+  types/
+    lead.ts
+    opportunity.ts
+  App.tsx
+  main.tsx
+
+Tech Stack
+
+React 18 + TypeScript
+
+Vite (bundler)
+
+Tailwind CSS (styling)
+
+React Query / Zustand / Context API (optional for state management)
+
+Local JSON + simulated latency with setTimeout
+
+Future Improvements
+
+Add pagination for leads
+
+Full mobile-first responsive design
+
+Add unit and integration tests (Jest + React Testing Library)
+
+Implement drag & drop for reordering opportunities
