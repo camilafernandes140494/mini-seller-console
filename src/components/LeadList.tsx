@@ -1,109 +1,101 @@
-import { useState, useMemo } from "react";
-import leadsData from "../data/leads.json";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { getLeads } from "../api/leads.api";
 import type { Lead } from "../types/lead";
+import { type Column, Table } from "./Table";
 
-export function LeadList() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [sortDesc, setSortDesc] = useState(true);
+interface LeadListProps {
+	onSelectLead: (lead: Lead) => void; // callback para retornar a linha selecionada
+}
 
-  const filteredLeads = useMemo(() => {
-    let filtered = leadsData as Lead[];
+export function LeadList({ onSelectLead }: LeadListProps) {
+	const [search, setSearch] = useState("");
+	const [statusFilter, setStatusFilter] = useState("");
+	const [sortDesc, setSortDesc] = useState(true);
 
-    // Search by name or company
-    if (search) {
-      filtered = filtered.filter(
-        (lead) =>
-          lead.name.toLowerCase().includes(search.toLowerCase()) ||
-          lead.company.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+	const {
+		data: leads,
+		isLoading,
+		isError,
+	} = useQuery({
+		queryKey: ["leads"],
+		queryFn: getLeads,
+	});
 
-    // Filter by status
-    if (statusFilter) {
-      filtered = filtered.filter((lead) => lead.status === statusFilter);
-    }
+	const columns: Column<Lead>[] = [
+		{ key: "name", label: "Name" },
+		{ key: "company", label: "Company" },
+		{ key: "email", label: "Email" },
+		{ key: "score", label: "Score" },
+		{
+			key: "status",
+			label: "Status",
+			render: (lead) => <span className="capitalize">{lead.status}</span>,
+		},
+	];
+	const filteredLeads = useMemo(() => {
+		if (!leads) return []; // se leads ainda não carregou, retorna array vazio
 
-    // Sort by score
-    filtered.sort((a, b) =>
-      sortDesc ? b.score - a.score : a.score - b.score
-    );
+		let filtered = [...leads]; // copia para não alterar o original
 
-    return filtered;
-  }, [search, statusFilter, sortDesc]);
+		if (search) {
+			filtered = filtered.filter(
+				(lead) =>
+					lead.name.toLowerCase().includes(search.toLowerCase()) ||
+					lead.company.toLowerCase().includes(search.toLowerCase()),
+			);
+		}
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Leads List</h1>
+		if (statusFilter) {
+			filtered = filtered.filter((lead) => lead.status === statusFilter);
+		}
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search by name or company"
-          className="border rounded px-3 py-2 flex-1 min-w-[200px]"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+		filtered.sort((a, b) => (sortDesc ? b.score - a.score : a.score - b.score));
 
-        <select
-          className="border rounded px-3 py-2"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="qualified">Qualified</option>
-          <option value="converted">Converted</option>
-        </select>
+		return filtered;
+	}, [leads, search, statusFilter, sortDesc]);
 
-        <button
-          className="bg-blue-500 text-white px-3 py-2 rounded"
-          onClick={() => setSortDesc(!sortDesc)}
-        >
-          Sort by Score {sortDesc ? "⬇" : "⬆"}
-        </button>
-      </div>
+	return (
+		<div className="p-6">
+			<h1 className="text-2xl font-bold mb-4">Leads List</h1>
 
-      {/* Leads Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2 text-left">Name</th>
-              <th className="border p-2 text-left">Company</th>
-              <th className="border p-2 text-left">Email</th>
-              <th className="border p-2 text-left">Source</th>
-              <th className="border p-2 text-left">Score</th>
-              <th className="border p-2 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLeads.length > 0 ? (
-              filteredLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-gray-50 cursor-pointer">
-                  <td className="border p-2">{lead.name}</td>
-                  <td className="border p-2">{lead.company}</td>
-                  <td className="border p-2">{lead.email}</td>
-                  <td className="border p-2">{lead.source}</td>
-                  <td className="border p-2">{lead.score}</td>
-                  <td className="border p-2 capitalize">{lead.status}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="border p-4 text-center text-gray-500"
-                >
-                  No leads found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+			{/* Filters */}
+			<div className="flex flex-wrap gap-4 mb-4">
+				<input
+					type="text"
+					placeholder="Search by name or company"
+					className="border rounded px-3 py-2 flex-1 min-w-[200px]"
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
+				/>
+
+				<select
+					className="border rounded px-3 py-2"
+					value={statusFilter}
+					onChange={(e) => setStatusFilter(e.target.value)}
+				>
+					<option value="">All Status</option>
+					<option value="new">New</option>
+					<option value="contacted">Contacted</option>
+					<option value="qualified">Qualified</option>
+					<option value="converted">Converted</option>
+				</select>
+
+				<button
+					className="bg-blue-500 text-white px-3 py-2 rounded"
+					onClick={() => setSortDesc(!sortDesc)}
+				>
+					Sort by Score {sortDesc ? "⬇" : "⬆"}
+				</button>
+			</div>
+
+			<Table
+				columns={columns}
+				data={leads || []}
+				onRowClick={onSelectLead}
+				isLoading={isLoading}
+				isError={isError}
+			/>
+		</div>
+	);
 }
