@@ -3,9 +3,10 @@ import { useMemo, useState } from "react";
 import { getLeads } from "../api/leads.api";
 import type { Lead } from "../types/lead";
 import { type Column, Table } from "./Table";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface LeadListProps {
-	onSelectLead: (lead: Lead) => void; // callback para retornar a linha selecionada
+	onSelectLead: (lead: Lead) => void;
 }
 
 export function LeadList({ onSelectLead }: LeadListProps) {
@@ -34,9 +35,9 @@ export function LeadList({ onSelectLead }: LeadListProps) {
 		},
 	];
 	const filteredLeads = useMemo(() => {
-		if (!leads) return []; // se leads ainda não carregou, retorna array vazio
+		if (!leads) return [];
 
-		let filtered = [...leads]; // copia para não alterar o original
+		let filtered = [...leads];
 
 		if (search) {
 			filtered = filtered.filter(
@@ -57,20 +58,30 @@ export function LeadList({ onSelectLead }: LeadListProps) {
 
 	return (
 		<div className="p-6">
-			<h1 className="text-2xl font-bold mb-4">Leads List</h1>
-
-			{/* Filters */}
-			<div className="flex flex-wrap gap-4 mb-4">
+			<h1 className="text-2xl font-bold mb-4">Leads</h1>
+			<div className="flex flex-wrap gap-4 mb-6">
 				<input
 					type="text"
 					placeholder="Search by name or company"
-					className="border rounded px-3 py-2 flex-1 min-w-[200px]"
+					className="
+      border border-gray-300 dark:border-gray-600 
+      rounded-md px-4 py-2 
+      flex-1 min-w-[200px] 
+      focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 
+      placeholder-gray-400 dark:placeholder-gray-500
+      transition
+    "
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 				/>
 
 				<select
-					className="border rounded px-3 py-2"
+					className="
+      border border-gray-300 dark:border-gray-600 
+      rounded-md px-4 py-2 
+      focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400
+      transition
+    "
 					value={statusFilter}
 					onChange={(e) => setStatusFilter(e.target.value)}
 				>
@@ -82,16 +93,26 @@ export function LeadList({ onSelectLead }: LeadListProps) {
 				</select>
 
 				<button
-					className="bg-blue-500 text-white px-3 py-2 rounded"
+					className="
+      bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700 
+      text-white px-4 py-2 rounded-md 
+      transition
+      flex items-center gap-2
+    "
 					onClick={() => setSortDesc(!sortDesc)}
+					type="button"
 				>
-					Sort by Score {sortDesc ? "⬇" : "⬆"}
+					Sort by Score
+					{sortDesc ? (
+						<ChevronDown className="w-4 h-4" />
+					) : (
+						<ChevronUp className="w-4 h-4" />
+					)}
 				</button>
 			</div>
-
 			<Table
 				columns={columns}
-				data={leads || []}
+				data={filteredLeads || []}
 				onRowClick={onSelectLead}
 				isLoading={isLoading}
 				isError={isError}
