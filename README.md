@@ -96,9 +96,9 @@ yarn install
 npm run dev
 # or
 yarn dev
+```
 
-
-Usage
+### Usage
 
 Open http://localhost:5173
 
@@ -121,7 +121,7 @@ src/
   App.tsx
   main.tsx
 
-Tech Stack
+### Tech Stack
 
 React 18 + TypeScript
 
@@ -133,7 +133,7 @@ React Query / Zustand / Context API (optional for state management)
 
 Local JSON + simulated latency with setTimeout
 
-Future Improvements
+### Future Improvements
 
 Add pagination for leads
 
